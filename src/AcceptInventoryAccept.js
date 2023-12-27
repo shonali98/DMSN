@@ -297,14 +297,36 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   console.log(hasPermission);
  
   const codeScanner = useCodeScanner({
-    codeTypes: ['qr', 'ean-13'],
+    codeTypes: ['ean-13'],
     onCodeScanned: (codes) => {
+      // const data =codes[0].value;
+        // console.log("imei scaned",data)
+      const data ='863352062053328';
+        console.log("imei scaned",data)
       if (isScanningAllowed) {
-        setScanningAllowed(false); // Disable scanning after the first scan
+        
+
+        setIsScanning(false)
+        // setScanningAllowed(false); 
         console.log(`Scanned ${codes[0].value} codes!!`);
-        setScannedCodes(codes);
+        Alert.alert('Scanned Code', `Scanned Code: ${codes[0].value}`);
+        // setScannedCodes(codes);
       }
+    const scannedIssueNo = issueNoteNoArray.data.find((item) =>
+    item.imeiNo === data ? item.issueNo : null
+    );
+    console.log("details",scannedIssueNo)
+    if(scannedIssueNo){
+      setDisplayTick((prevDisplayTick) => [...prevDisplayTick, data]);
+
+    }else{
+    // Alert(`Bar code invalid!`);
+
+    }
+    setScannedImei(data)
+    setIsScanning(false)
     },
+    
   });
 
 
