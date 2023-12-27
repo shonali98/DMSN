@@ -297,11 +297,11 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   console.log(hasPermission);
  
   const codeScanner = useCodeScanner({
-    codeTypes: ['ean-13'],
+    codeTypes: ['code-128'],
     onCodeScanned: (codes) => {
       // const data =codes[0].value;
         // console.log("imei scaned",data)
-      const data ='863352062053328';
+      const data =codes[0].value;
         console.log("imei scaned",data)
       if (isScanningAllowed) {
         
