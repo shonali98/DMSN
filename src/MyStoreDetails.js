@@ -65,7 +65,20 @@ function MyStoreDetails({navigation,route}) {
         </View>
 
         <View style={styles.options}>
-        
+        <View style={styles.formFiled}>
+            <View style={styles.formFiled1}>
+                <Text style={styles.input1}>Items : </Text>
+                <Text style={styles.input1}>{myStoredata.totalRecords} </Text>
+
+            </View>
+            <View style={styles.formFiled1}>
+                <Text style={styles.input1}>Total Cost : </Text>
+                {/* <Text style={styles.input1}> </Text> */}
+                
+            </View>
+          
+
+        </View>
         <View style={styles.items}>
         <FlatList
           style={styles.items}
