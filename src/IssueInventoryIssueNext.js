@@ -66,7 +66,9 @@ function IssueInventoryIssueNext({navigation,route}) {
       try {
         setLoadingIssueNo(true);
 
-        const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei?status=2&dsrId=${data.data[0].extraParams}`;
+        // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei?status=2&dsrId=${data.data[0].extraParams}`;
+        const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getAllDSRModelList?dSRId=${data.data[0].extraParams}`;
+
 
         const response = await fetch(apiUrl, {
           method: 'GET',
@@ -76,11 +78,11 @@ function IssueInventoryIssueNext({navigation,route}) {
         if (response.ok) {
           const data = await response.json();
 
-
+          console.log(data)
       const uniqueErpModelSet = new Set();
 
       data.data.forEach(item => {
-        uniqueErpModelSet.add(item.erpModel);
+        uniqueErpModelSet.add(item.erp_part);
       });
 
       const erpModelList = Array.from(uniqueErpModelSet);
@@ -361,7 +363,7 @@ const closeModal1 = async() => {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent1}>
                 <Image
-                source={require('./img/loading.gif')}
+                source={require('./img/loading2.gif')}
                 style={styles.LoadingbuttonImage}
                 />
               </View>
@@ -557,6 +559,10 @@ const styles = StyleSheet.create({
     borderBottomColor: '#ddd',
     width: '90%',
   },
+  LoadingbuttonImage:{
+    height:100,
+    width:100,
+  },
   closeModalButton: {
     alignSelf: 'flex-end',
     padding: '10%',
@@ -649,7 +655,7 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
     padding:'20%'  
   },
   

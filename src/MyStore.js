@@ -48,6 +48,7 @@ function MyStore({navigation,route}) {
 
       useEffect(() => {
         calculateTotalCost();
+        calculateTotalItems()
       }, [myStoredata]);
 
     
@@ -63,7 +64,16 @@ function MyStore({navigation,route}) {
         console.log('Item pressed:', item);
         navigation.navigate('MyStoreDetails',{data,item})
       };
-      
+      const calculateTotalItems = () => {
+        if (myStoredata && myStoredata.data) {
+          const totalItems = myStoredata.data.reduce((total, item) => {
+            const itemCnt = parseInt(item.imeiCnt, 10); // Convert item.imeiCnt to an integer
+            return total + itemCnt;
+          }, 0);
+          return totalItems;
+        }
+        return 0;
+      };
   return (
     <View style={styles.container}>
         <View style={styles.nav}>
@@ -81,7 +91,7 @@ function MyStore({navigation,route}) {
         <View style={styles.formFiled}>
             <View style={styles.formFiled1}>
                 <Text style={styles.input1}>Items : </Text>
-                <Text style={styles.input1}>{myStoredata.totalRecords} </Text>
+                <Text style={styles.input1}>{calculateTotalItems()} </Text>
 
             </View>
             <View style={styles.formFiled1}>
@@ -105,8 +115,8 @@ function MyStore({navigation,route}) {
     >
       <View style={styles.itemContainer}>
         <Text style={styles.itemText}>{item.erpNo}</Text>
-        <Text style={styles.itemText}>IMEI Count: {item.imeiCnt}</Text>
-        <Text style={styles.itemText}>Sum Cost: {item.sumCost}</Text>
+        <Text style={styles.itemText}>No of Items: {item.imeiCnt}</Text>
+        <Text style={styles.itemText}>Item Cost: {item.sumCost}</Text>
       </View>
     </TouchableOpacity>
           )}

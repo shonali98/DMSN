@@ -1,14 +1,18 @@
 // import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity,Image,TextInput,Alert,FlatList,Modal } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity,Image,TextInput,Alert,FlatList,Modal ,Button} from 'react-native';
 import React , {useState}from 'react';
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DatePicker from 'react-native-date-picker';
 
 function AcceptInventoryView({navigation,route}) {
   const { data } = route.params;
 
   console.log('Received dsrid:', data.data[0].extraParams);
   const [selectedOption, setSelectedOption] = useState('');
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+  // const [fromDate, setFromDate] = useState('');
+  const [fromDate, setFromDate] = useState(new Date());
+
+  const [toDate, setToDate] = useState(new Date());
   const[optionStatus,setOptionStatus]=useState();
   const [loadingIssueNo, setLoadingIssueNo] = useState(false);
 
@@ -32,26 +36,42 @@ function AcceptInventoryView({navigation,route}) {
     }
   };
 
-  const handleFromDateChange = (text) => {
-    if (text.length === 4 && !text.includes('/')) {
-      text += '/';
-    }// Check if the length is 7 and append "/" after the month
-  else if (text.length === 7 && !text.endsWith('/')) {
-    text += '/';
-  }
-    setFromDate(text);
+  // const handleFromDateChange = (text) => {
+  //   if (text.length === 4 && !text.includes('/')) {
+  //     text += '/';
+  //   }// Check if the length is 7 and append "/" after the month
+  // else if (text.length === 7 && !text.endsWith('/')) {
+  //   text += '/';
+  // }
+  //   setFromDate(text);
+  //   console.log('from date',text)
+  // };
+  const handleFromDateChange = (selectedDate) => {
+    // Use the selected date directly
+    console.log('from date', selectedDate);
+
+  setFromDate(selectedDate);
+
   };
-    
-  const handleToDateChange = (text) => {
-    if (text.length === 4 && !text.includes('/')) {
-      text += '/';
-    }// Check if the length is 7 and append "/" after the month
-  else if (text.length === 7 && !text.endsWith('/')) {
-    text += '/';
-  }
-    setToDate(text);
+  
+
+  // const handleToDateChange = (text) => {
+  //   if (text.length === 4 && !text.includes('/')) {
+  //     text += '/';
+  //   }// Check if the length is 7 and append "/" after the month
+  // else if (text.length === 7 && !text.endsWith('/')) {
+  //   text += '/';
+  // }
+  //   setToDate(text);
+  // };
+  const handleToDateChange = (selectedDate) => {
+    // Use the selected date directly
+    console.log('from date', selectedDate);
+
+    setToDate(selectedDate);
+
+
   };
- 
   const parseCustomDate = (dateString) => {
     const [year, month, day] = dateString.split('/');
     return new Date(year, month - 1, day); // month is zero-based in JavaScript Date object
@@ -79,15 +99,17 @@ function AcceptInventoryView({navigation,route}) {
         if (response.ok) {
   
           const data = await response.json();
-          console.log("Data received:", data);
+          // console.log("Data received:", data);
 
       if (data && data.data && data.data.length > 0) {
         const issueDates = data.data.map((item) => item.issueDate);
         console.log("Issue Dates:", issueDates);
 
         // Convert fromDate and toDate to Date objects using parseCustomDate
-        const startDate = parseCustomDate(fromDate);
-        const endDate = parseCustomDate(toDate);
+        const startDate =fromDate;
+        const endDate = toDate;
+        console.log(fromDate)
+        console.log(toDate)
 
         // Filter issueDates based on fromDate and toDate
         const filteredIssueDates = issueDates.filter(
@@ -110,6 +132,7 @@ function AcceptInventoryView({navigation,route}) {
           }
         }
         setLoadingIssueNo(false);
+        navigation.navigate('AcceptInventoryViewSearch',{data:data,displayData: filteredData,selectedOption:selectedOption})
 
       } else {
         console.log("No data or empty data array.");
@@ -125,7 +148,8 @@ function AcceptInventoryView({navigation,route}) {
   
         console.error("Error during request:", error);
       }
-        setShowFlatList(true)
+        // setShowFlatList(true)
+
       };
       const TableHeader = () => (
         <View style={styles.tableRow}>
@@ -185,6 +209,38 @@ function AcceptInventoryView({navigation,route}) {
         };
     
        
+        // const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
+        // const [selectedDate, setSelectedDate] = useState(null);
+      
+        // const showDatePicker = () => {
+        //   setDatePickerVisibility(true);
+        // };
+      
+        // const hideDatePicker = () => {
+        //   setDatePickerVisibility(false);
+        // };
+      
+        // const handleConfirm = (date) => {
+        //   setSelectedDate(date);
+        //   hideDatePicker();
+        // }; 
+
+
+        // const [date, setDate] = useState(new Date());
+        // const [mode, setMode] = useState('date'); // 'datetime', 'date', 'time'
+      
+        const [isDisplayEnableFromDate,setDisplayEnableFromDate]=useState(false)
+        const handleDisplayFromDate=()=>{
+          setDisplayEnableFromDate(!isDisplayEnableFromDate)
+          setDisplayEnableToDate(false)
+        }
+
+        
+        const [isDisplayEnableToDate,setDisplayEnableToDate]=useState(false)
+        const handleDisplayToDate=()=>{
+          setDisplayEnableToDate(!isDisplayEnableToDate)
+          setDisplayEnableFromDate(false)
+        }
       
   return (
     <View style={styles.container}>
@@ -223,29 +279,59 @@ function AcceptInventoryView({navigation,route}) {
         <View style={styles.details}>
             <View style={styles.details1}>
                 <Text style={styles.optionbtnText1}>From Date </Text>         
-                <TextInput
-            style={styles.dateInput}
-            placeholder="YYYY-MM-DD"
-            value={fromDate}
-            onChangeText={handleFromDateChange}
-            keyboardType="numeric"
-          />
+                <Text> {fromDate.toLocaleDateString()}</Text>
+
             </View>
+            <TouchableOpacity style={styles.datebtn} onPress={handleDisplayFromDate}>
+            <Image source={require('./img/calender.png')} style={styles.datebuttonImage} />
+          </TouchableOpacity>
         </View>
         <View style={styles.details}>
             <View style={styles.details1}>
                 <Text style={styles.optionbtnText1}>To Date </Text>       
-                <TextInput
+                {/* <TextInput
             style={styles.dateInput}
             placeholder="YYYY-MM-DD"
             value={toDate}
             onChangeText={handleToDateChange}
             keyboardType="numeric"
-          />  
+          />   */}
+          <Text> {toDate.toLocaleDateString()}</Text>
+
             </View>
+            <TouchableOpacity style={styles.datebtn} onPress={handleDisplayToDate}>
+            <Image source={require('./img/calender.png')} style={styles.datebuttonImage} />
+          </TouchableOpacity>
         </View>
         {/* --------------------- */}
         
+        
+      
+
+      {isDisplayEnableFromDate && (
+    <View style={styles.datePickerContainer}>
+      <DatePicker
+        date={fromDate}
+        onDateChange={handleFromDateChange}
+        mode="date"
+        style={styles.datePicker}
+      />
+
+      
+    </View>
+  )}
+{isDisplayEnableToDate && (
+    <View style={styles.datePickerContainer}>
+      <DatePicker
+        date={toDate}
+        onDateChange={handleToDateChange}
+        mode="date"
+        style={styles.datePicker}
+      />
+
+      
+    </View>
+  )}
 
         {/* --------------------- */}
         <View style={styles.search}>
@@ -276,7 +362,7 @@ function AcceptInventoryView({navigation,route}) {
             <View style={styles.modalContainer}>
               <View style={styles.modalContent1}>
               <Image
-                source={require('./img/loading.gif')}
+                source={require('./img/loading2.gif')}
                 style={styles.LoadingbuttonImage}
               />
               </View>
@@ -417,16 +503,46 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   LoadingbuttonImage:{
-    height:50,
-    width:50,
+    height:100,
+    width:100,
   },
   modalContent1: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: 'white',
+    // backgroundColor: 'white',
     padding:'20%'  
   },
+  datebtn:{
+    backgroundColor:'#ba181b',
+    // width:'40%',
+    // height: 40,
+    borderRadius: 20,
+    paddingVertical: 10,
+    paddingHorizontal: 10,
+    elevation: 5, // For Android shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 7, height: 7 },
+    shadowOpacity: 0.2,
+    shadowRadius: 20,
+    marginVertical: 10,
+    
+
+   
+  },
+  datebuttonImage: {
+    height: 20,
+    width: 20,
+  },
+  datePickerContainer: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    backgroundColor: '#fff',
+    padding: 10,
+  },
+  
 });
 
 export default AcceptInventoryView;

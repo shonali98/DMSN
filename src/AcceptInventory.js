@@ -5,9 +5,7 @@ function AcceptInventory({navigation,route}) {
   const { data } = route.params;
 
   console.log('Received Dsrid:', data.data[0].extraParams); 
-  const handleChangePassword = () => {
-    
-  };
+ 
   const handleGotoAccept =()=>{
     navigation.navigate('AcceptInventoryAccept',{data})
   }
@@ -25,7 +23,6 @@ function AcceptInventory({navigation,route}) {
             </TouchableOpacity>
             <Text style={styles.navtext}>Accept Inventory</Text>
             <TouchableOpacity style={styles.button} onPress={handleback}>
-                {/* <Text style={styles.buttonText}>Change password</Text> */}
                 <Image source={require('./img/list.png')} style={styles.buttonImage} />
             </TouchableOpacity>
         </View>

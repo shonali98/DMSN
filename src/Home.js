@@ -8,8 +8,9 @@ function Home({navigation,route}) {
   // const dsrId=extraParams;
   console.log('Received dsrId:', data.data[0].extraParams); 
 
-  const handleChangePassword = () => {
-    console.log('Changing password...');
+  const handleLogin = () => {
+    navigation.navigate('Login');
+
   };
 
   const handleAcceptInventory =()=>{
@@ -31,8 +32,7 @@ function Home({navigation,route}) {
     <View style={styles.container}>
         <View style={styles.nav}>
         
-            <TouchableOpacity style={styles.button} onPress={handleChangePassword}>
-                {/* <Text style={styles.buttonText}>Change password</Text> */}
+            <TouchableOpacity style={styles.button} onPress={handleLogin}>
                 <Image source={require('./img/changepassword.png')} style={styles.buttonImage} />
 
             </TouchableOpacity>

@@ -1,14 +1,11 @@
 import React, { useState,useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, TextInput,Alert ,FlatList,ScrollView,Modal,Button} from 'react-native';
-// import { BarCodeScanner } from 'expo-barcode-scanner';
 import {
   useCameraPermission,
   useCameraDevice,
   Camera,
   useCodeScanner,
 } from 'react-native-vision-camera';
-
-
 function AcceptInventoryAccept({ navigation,route }) {
 
   const { data } = route.params;
@@ -23,9 +20,7 @@ function AcceptInventoryAccept({ navigation,route }) {
   const [displayTick,setDisplayTick]=useState([])
 
 
-  const handleChangePassword = () => {
-    console.log('Changing password...');
-  };
+  
 
   const handleBack = () => {
     navigation.navigate('AcceptInventory',{data});
@@ -93,25 +88,11 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
         </View>
       );
     
-      // const TableRow = ({ item }) => (
-      //   <View style={styles.tableRow}>
-      //     <Image
-      //       source={
-      //       displayTick.includes(item.imeiNo)
-      //     ? require('./img/greentick.png')
-      //     : require('./img/blacktick.png')
-      //   }
-      //       style={styles.selectedbuttonImage}
-      //   />
-      //     <Text style={styles.tableCell}>{item.imeiNo}</Text>
-      //     <Text style={styles.tableCell}>{item.erpModel}</Text>
-      //   </View>
-      // );
+ 
       const TableRow = ({ item }) => (
         <View style={styles.tableRow}>
           <TouchableOpacity
             onPress={() => {
-              // Toggle the item's presence in displayTick
               setDisplayTick((prevDisplayTick) => {
                 if (prevDisplayTick.includes(item.imeiNo)) {
                   // Remove the item from displayTick
@@ -186,14 +167,10 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
       );
 
       const renderIssueNoItem = ({ item }) => (
-        // <View style={styles.issueNotableRow}>
-        //   <Text style={styles.issueNotableCell}>{item}</Text>
 
-        // </View>
         <TouchableOpacity
           style={styles.issueNotableRow}
           onPress={() => {
-          // setSelectedIssueNo(item);
           setIssueNoteNo(item)
            closeModal(); 
            }
@@ -204,7 +181,6 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
       );
 
       useEffect(() => {
-        // setIssueNoteNo(selectedIssueNo)
         if (issueNoteNo) {
 
           console.log('Selected Issue No changed, calling handleGetItems...');
@@ -213,13 +189,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
         }
       }, [issueNoteNo]);
 
-      // useEffect(() => {
-      //   // setIssueNoteNo(selectedIssueNo)
 
-      //   if (scannedImei) {
-      //     console.log('Selected Issue No changed, calling handleGetItems...', scannedImei);
-      //   }
-      // }, [scannedImei]);
   
   const handleOk = () => {
     console.log(`Fetching items for IMEI No: ${imeiNo}`);
@@ -237,49 +207,10 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
     setIsScanning(true);
     setScanned(false);
   };
-  // const [hasPermission, setHasPermission] = useState(null);
   const [scanned, setScanned] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  // useEffect(() => {
-  //   const getBarCodeScannerPermissions = async () => {
-  //     const { status } = await BarCodeScanner.requestPermissionsAsync();
-  //     setHasPermission(status === 'granted');
-  //   };
-
-  //   getBarCodeScannerPermissions();
-  // }, []);
-
   const[scannedImei,setScannedImei]=useState('')
-  const handleBarCodeScanned = ({ type, data }) => {
-    setScanned(true);
-    // alert(`Bar code with type ${type} and data ${data} has been scanned!`);
-    console.log("imei scaned",data)
-    const scannedIssueNo = issueNoteNoArray.data.find((item) =>
-    item.imeiNo === data ? item.issueNo : null
-    );
-    console.log("details",scannedIssueNo)
-    if(scannedIssueNo){
-      setDisplayTick((prevDisplayTick) => [...prevDisplayTick, data]);
-
-    }else{
-    // Alert(`Bar code invalid!`);
-
-    }
-    setScannedImei(data)
-    setIsScanning(false)
-  };
-  // ... (previous code)
-
-
-
-  // if (hasPermission === null) {
-  //   return <Text>Requesting for camera permission</Text>;
-  // }
-  // if (hasPermission === false) {
-  //   return <Text>No access to camera</Text>;
-  // }
   let device = useCameraDevice('back');
- 
   const [scannedCodes, setScannedCodes] = useState([]);
   const [isScanningAllowed, setScanningAllowed] = useState(true); // State to control scanning
   const { hasPermission, requestPermission } = useCameraPermission();
@@ -297,20 +228,16 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   console.log(hasPermission);
  
   const codeScanner = useCodeScanner({
-    codeTypes: ['code-128'],
+    codeTypes: ['code-128','ean-13'],
     onCodeScanned: (codes) => {
-      // const data =codes[0].value;
-        // console.log("imei scaned",data)
       const data =codes[0].value;
         console.log("imei scaned",data)
       if (isScanningAllowed) {
         
 
         setIsScanning(false)
-        // setScanningAllowed(false); 
         console.log(`Scanned ${codes[0].value} codes!!`);
         Alert.alert('Scanned Code', `Scanned Code: ${codes[0].value}`);
-        // setScannedCodes(codes);
       }
     const scannedIssueNo = issueNoteNoArray.data.find((item) =>
     item.imeiNo === data ? item.issueNo : null
@@ -320,7 +247,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
       setDisplayTick((prevDisplayTick) => [...prevDisplayTick, data]);
 
     }else{
-    // Alert(`Bar code invalid!`);
+    Alert.alert(`Bar code invalid!`);
 
     }
     setScannedImei(data)
@@ -351,7 +278,6 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
         </TouchableOpacity>
       </View>
 
-      {/* <ScrollView style={styles.details}> */}
       <View style={styles.formFiled}>
           <TextInput
             style={styles.input}
@@ -416,9 +342,10 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
             <View style={styles.modalContainer}>
               <View style={styles.modalContent1}>
               <Image
-                source={require('./img/loading.gif')}
+                source={require('./img/loading2.gif')}
                 style={styles.LoadingbuttonImage}
               />
+              
               </View>
             </View>
           </Modal>
@@ -487,10 +414,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   </View>
 )}
 
-{/* ----------------------------- */}
-{/* <TouchableOpacity style={styles.optionbtn} onPress={handleScan}>
-        <Text style={styles.optionbtnText}>Scan</Text>
-      </TouchableOpacity> */}
+
       <View style={styles.submit}>
           <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
             <Image source={require('./img/submit.png')} style={styles.submitbuttonImage} />
@@ -502,7 +426,6 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
           </TouchableOpacity>
         </View>
       {isScanning && hasPermission && isgranted && (
-        // <View style={styles.box}>
         <View style={styles.barcodeContainer}>
           <Camera
             style={StyleSheet.absoluteFill}
@@ -510,53 +433,13 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
             codeScanner={codeScanner}
             isActive={true}
             onCodeScanned={(codes) => {
-              // Handle scanned codes as needed
               console.log('Scanned Codes:', codes);
-              stopScanning(); // Stop scanning after the first scan
+              stopScanning(); 
             }}
           />
         </View>
       )}
-{/* <View style={ styles.box}>
-      {hasPermission && isgranted  &&  (<Camera style={StyleSheet.absoluteFill} device={device} codeScanner={codeScanner} isActive={true} />)}     
-      {scannedCodes.length > 0 && (
-        <View style={styles.overlay}>
-          <Text>Scanned Codes:</Text>
-          {scannedCodes.map((code, index) => (
-            <Text key={index}>{code.value}</Text>
-          ))}
-        </View>
-      )}
-    </View> */}
-   
-         {/* {isScanning && (
-        <View style={styles.barcodeContainer}>
-          <BarCodeScanner
-            onBarCodeScanned={scanned ? undefined : handleBarCodeScanned}
-            style={StyleSheet.absoluteFillObject}
-          />
-          {scanned && (
-            <TouchableOpacity style={styles.rescanButton} onPress={() => setScanned(false)}>
-              <Text style={styles.rescanButtonText}>Tap to Scan Again</Text>
-            </TouchableOpacity>
-          )}
-        </View>
-      )}
 
-        {!isScanning && (
-        <View style={styles.submit}>
-          <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
-            <Image source={require('./img/submit.png')} style={styles.submitbuttonImage} />
-            <Text style={styles.submitbtnText}>Submit</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.scanbtn} onPress={handleScan}>
-            <Image source={require('./img/barcode.png')} style={styles.submitbuttonImage} />
-            <Text style={styles.submitbtnText}>Scan</Text>
-          </TouchableOpacity>
-        </View>
-      )} */}
-     
-      {/* </ScrollView> */}
     </View>
   );
 }
@@ -599,25 +482,26 @@ const styles = StyleSheet.create({
 
 },
   formFiled: {
+    width:'98%',
     flexDirection: 'row',
     alignItems:'center',
     justifyContent:'space-between',
     marginVertical: 1,
   },
   input: {
-    width:'60%',
-    borderBottomWidth: 1,  
-    borderBottomColor: '#696969',  
-    paddingBottom: 10,  
-    marginBottom: '4%', 
+    // width:'30%',
+    // borderBottomWidth: 1,  
+    // borderBottomColor: '#696969',  
+    // paddingBottom: 10,  
+    // marginBottom: '4%', 
   },
   searchinput: {
-    width:'60%', 
+    // width:'60%', 
     fontWeight:'600',
     color:'#000',
   },
   selectAll:{
-    width:'90%',
+    width:'97%',
     fontWeight:'600',
     color:'#000',
     paddingBottom: 10,  
@@ -708,9 +592,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-    width:'100%',
-    // paddingLeft:'5%',
-    marginLeft:'10%',
+
 
 
   },
@@ -718,13 +600,12 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: 'bold',
     padding:'5%',
-    // marginVertical: 10,
     
   },
   tableCell: {
     fontSize: 14,
-    // marginVertical: 10,
-    width:'50%',
+    // width:'50%',
+    // margin:'2%'
 
 
   },
@@ -747,7 +628,7 @@ const styles = StyleSheet.create({
     marginTop: 20,
     paddingVertical: 10,
     paddingHorizontal: 25,
-    elevation: 5, // For Android shadow
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 7, height: 7 },
     shadowOpacity: 0.2,
@@ -765,7 +646,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     paddingVertical: 10,
     paddingHorizontal: 35,
-    elevation: 5, // For Android shadow
+    elevation: 5,
     shadowColor: '#000',
     shadowOffset: { width: 7, height: 7 },
     shadowOpacity: 0.2,
@@ -780,7 +661,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '800',
   },
-//   ----------------------------
 issueNotableRow: {
   flexDirection: 'row',
   justifyContent: 'space-between',
@@ -808,7 +688,8 @@ modalContent: {
   backgroundColor: '#fff',
   borderRadius: 10,
   padding: 20,
-  margin:'10%'
+  margin:'10%',
+
 
 },
 closeModalButton: {
@@ -820,38 +701,19 @@ closeModalText: {
   fontWeight: 'bold',
 },
 LoadingbuttonImage:{
-  height:50,
-  width:50,
+  height:100,
+  width:100,
 },
 modalContent1: {
   flex: 1,
   justifyContent: 'center',
   alignItems: 'center',
-  backgroundColor: 'white',
-  padding:'20%'  
+  // backgroundColor: 'white',
+  margin:'50%',
+  height:50
 },
-alertMsg: {
-  position: 'absolute',
-  bottom: 20,
-  left: 20,
-  right: 20,
-  backgroundColor: 'white',
-  color: 'black',
-  padding: 10,
-  borderRadius: 5,
-},
-box:{
-  width: '90%',
-  height: '50%',
-  alignSelf: 'center',
-  borderRadius: 10,
-  marginTop: 20,
-  marginBottom: 20,
-  borderColor: 'black',
-  borderWidth: 2,
-  justifyContent: 'center',
-  alignItems: 'center',
-}
+
+
 });
 
 export default AcceptInventoryAccept;
