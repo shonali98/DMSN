@@ -52,14 +52,29 @@ function MyStore({navigation,route}) {
       }, [myStoredata]);
 
     
+      // const calculateTotalCost = () => {
+      //   if (myStoredata && myStoredata.data) {
+      //     const calculatedTotal = myStoredata.data.reduce((total, item) => total + parseFloat(item.sumCost), 0).toFixed(2);
+      //     setTotalCost(calculatedTotal); // Set the calculated total cost to the state
+      //     return calculatedTotal;
+      //   }
+      //   return 0;
+      // };
+      const formatNumberWithCommas = (number) => {
+        return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+      };
+      
       const calculateTotalCost = () => {
         if (myStoredata && myStoredata.data) {
-          const calculatedTotal = myStoredata.data.reduce((total, item) => total + parseFloat(item.sumCost), 0).toFixed(2);
-          setTotalCost(calculatedTotal); // Set the calculated total cost to the state
-          return calculatedTotal;
+          const calculatedTotal = myStoredata.data.reduce((total, item) => total + parseFloat(item.sumCost), 0);
+          const formattedTotal = formatNumberWithCommas(calculatedTotal.toFixed(2));
+      
+          setTotalCost(formattedTotal); // Set the formatted total cost to the state
+          return formattedTotal;
         }
         return 0;
       };
+      
       const handleItemPress = (item) => {
         console.log('Item pressed:', item);
         navigation.navigate('MyStoreDetails',{data,item})

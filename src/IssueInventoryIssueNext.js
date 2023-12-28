@@ -330,7 +330,12 @@ const closeModal1 = async() => {
                   <TouchableOpacity style={styles.closeModalButton} onPress={closeModal1}>
                     <Text style={styles.closeModalText}>Close</Text>
                   </TouchableOpacity>
-            
+                  <View style={styles.formFiled}>
+                  <Text style={styles.closeModalText}>Item Count: {displayTick.length}</Text>                    
+                  </View>
+                  <View style={styles.formFiled}>
+                  <Text style={styles.closeModalText}>Total Cost: </Text>                    
+                  </View>
                   <View style={styles.formFiled3}>
                     <FlatList
                       data={issueNoteNoArray.data && displayTick
