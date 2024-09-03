@@ -157,7 +157,7 @@ function AcceptInventoryViewSearchView({navigation,route}) {
         </View>
         <View style={styles.done}>
           
-          <TouchableOpacity style={styles.donebtn} >
+          <TouchableOpacity style={styles.donebtn} onPress={handleback} >
             <Image source={require('./img/submit.png')} style={styles.donebuttonImage} />
             <Text style={styles.donebtnText}>Done</Text>
           </TouchableOpacity>

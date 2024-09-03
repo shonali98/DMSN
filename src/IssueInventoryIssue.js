@@ -3,8 +3,11 @@ import { View, Text, StyleSheet, TouchableOpacity,Image,TextInput } from 'react-
 import { Picker } from '@react-native-picker/picker';
 function IssueInventoryIssue({navigation,route}) {
   const{data}=route.params;
+  console.log("received dsrId-----------------------------------",data.distributorName)
 
-  console.log("received dsrId",data.data[0].extraParams)
+  console.log("received dsrId",data.data[0].userId)
+
+  console.log("received dsrId", data.data[0].dsrId)
 
   const [selectedValue, setSelectedValue] = useState('');
   const[date,setDate]=useState('')
@@ -19,13 +22,29 @@ function IssueInventoryIssue({navigation,route}) {
   }
 
   const gotoNext=async()=>{
-    navigation.navigate('IssueInventoryIssueNext',{data})
+    console.log("selected dsr",selectedValue)
+    console.log("dsr",dsrDetails)
+
+
+// Find the user details based on the selected user
+const userDetails = dsrDetails.find(dsr => dsr.bisName === selectedValue);
+
+// Check if the user is found and log the details
+if (userDetails) {
+    console.log('User Details:', userDetails);
+} else {
+    console.log('User not found in dsrDetails.');
+}
+    navigation.navigate('IssueInventoryIssueNext',{data:data,userDetails:userDetails})
   }
 
   const[options,setOptions]=useState([])
+  const [dsrDetails,setDsrDetails]=useState([])
   const handleGetDsrSub = async () => {
     try {
-      const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/UserTypeLists/getUserTypeListLowUpper?userId=mtec`;
+      console.log("--------------",data.data[0].userId)
+      const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/UserTypeLists/getUserTypeListLowUpper?userId=${data.data[0].userId}&distributorName=${data.distributorName}`;
+      // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/UserTypeLists/getUserTypeListLowUpper?userId=mtec`;
   
       const response = await fetch(apiUrl, {
         method: "GET",
@@ -42,6 +61,7 @@ function IssueInventoryIssue({navigation,route}) {
         // console.log("users",users)
         // setOptions(users);
         // Add a default prompt to the beginning of the options array
+        setDsrDetails(responseData.data)
         const users = ['Select DSR/SubDealer', ...responseData.data.map(item => item.userId)];
         console.log("users",users)
         setOptions(users);

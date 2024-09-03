@@ -45,8 +45,9 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   const handleGetItems =async  () => {
     try {
       setLoadingIssueNo(true);
-
-        const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei?issueNo=${issueNoteNo}&status=2&dsrId=${data.data[0].extraParams}`;
+      setIssueNoteNoArray([]);
+        // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei?issueNo=${issueNoteNo}&status=2&dsrId=${data.data[0].extraParams}`;
+        const apiUrl = `http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/AcceptInventories/getAcceptInventoryImei?issueNo=${issueNoteNo}&status=2&dsrId=${data.data[0].extraParams}`;
         
         const response = await fetch(apiUrl, {
           method: "GET",
@@ -103,6 +104,9 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
                 }
               });
             }}
+            disabled={displayTick.includes(item.imeiNo)} 
+            style={displayTick.includes(item.imeiNo) ? { opacity: 0.5 } : {}} 
+          
           >
             <Image
               source={
@@ -129,22 +133,39 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
         try {
           setLoadingIssueNo(true);
     
-          const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei`;
+          // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventory?status=2&dsrId=${data.data[0].extraParams}`;
+          const apiUrl = `http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/AcceptInventories/getAcceptInventory?status=2&dsrId=${data.data[0].extraParams}`;
     
           const response = await fetch(apiUrl, {
             method: "GET",
             headers: {},
           });
     
+          // if (response.ok) {
+          //   const data = await response.json();
+          //   console.log(data)
+          //   const issueNoList = data.data.map((item) => item.issueNo);
+          //   console.log("IssueNo List:", issueNoList);
+          //   setIssueNoList(issueNoList);
+          //   setChangeText(true)
+          //   setShowIssueList(true);
+          //   setShowIssueListModal(true);
+
+          // after sort
           if (response.ok) {
             const data = await response.json();
-    
-            const issueNoList = data.data.map((item) => item.issueNo);
-            console.log("IssueNo List:", issueNoList);
+            console.log(data);
+            
+            // Map and sort the issue numbers
+            const issueNoList = data.data.map((item) => item.issueNo).sort((a, b) => a - b);
+            console.log("Sorted IssueNo List:", issueNoList);
+            
             setIssueNoList(issueNoList);
-            setChangeText(true)
+            setChangeText(true);
             setShowIssueList(true);
             setShowIssueListModal(true);
+        
+        
           } else {
             console.error("Request failed with status:", response.status);
           }
@@ -198,10 +219,77 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
     setImeiNo('')
   };
 
-  const handleSubmit = () => {
-    console.log('Submitting selected items');
-  };
+  // const handleSubmit = () => {
+  //   console.log('Submitting selected items');
+  // };
+  const handleSubmit = async () => {
+    // Prepare the data to be sent in the request
+    setLoadingIssueNo(true);
+    console.log("selected",displayTick);
+    console.log("selected",issueNoteNoArray);
 
+    const subdealerName = issueNoteNoArray.data[0].subdealerCode;
+    console.log(subdealerName);
+
+    const currentDate = new Date().toLocaleDateString();
+    const requestData = {
+      issueNo: selectedIssueNo,
+      acceptInvImei:[],
+      status: 3,
+      dsrId: data.data[0].extraParams,
+      issueDate: currentDate,
+      statusMsg: issueNoteNoArray.data[0].statusMsg,
+      distributerID: 9876,
+      price: 60.75,
+      distributorMargin: 12.0,
+      delerMargin: 9.25,
+      discount: 7.5,
+      user: 'Jane Smith',
+      toName: 'Recipient Name',
+      distributorAddress: issueNoteNoArray.data[0].distributorAddress,
+      distributorCode: issueNoteNoArray.data[0].distributorCode,
+      distributorName: issueNoteNoArray.data[0].distributorName,
+      distributorTelephone: issueNoteNoArray.data[0].distributorTelephone,
+      subdealerAddress:  issueNoteNoArray.data[0].subdealerAddress,
+      subdealerCode: issueNoteNoArray.data[0].subdealerCode,
+      subdealerName: issueNoteNoArray.data[0].subdealerName,
+      type: 'Type B',
+      subdealerTelephone:issueNoteNoArray.data[0].subdealerTelephone,
+      manualReceiptNo: 'MAN-004',
+    };
+  
+    try {
+      const apiUrl = 'http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/AcceptInventories/addAcceptInventory';
+  
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        // Handle the response data as needed
+        console.log('Response Data:', responseData);
+        console.log('Request Data:', requestData);
+
+        Alert.alert('Success', 'Inventory accepted successfully.');
+      } else {
+        console.error('Request failed with status:', response.status);
+        Alert.alert('Error', 'Failed to submit inventory. Please try again.');
+      }
+      setLoadingIssueNo(false);
+
+    } catch (error) {
+      console.error('Error during request:', error);
+      Alert.alert('Error', 'An error occurred while processing your request.');
+    }
+  };
+  
+
+  // ---------------------------------------------------------------------------------------------------
   const handleScan = () => {
     console.log('Scanning...');
     setIsScanning(true);
@@ -215,6 +303,8 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
   const [isScanningAllowed, setScanningAllowed] = useState(true); // State to control scanning
   const { hasPermission, requestPermission } = useCameraPermission();
   const[isgranted, setIsGranted]= useState(false)
+
+ 
 
   useEffect(() => {
     if (!hasPermission) {
@@ -265,6 +355,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
     console.log('Stopping scanning...');
     setIsScanning(false);
   };
+
   return (
     
     <View style={styles.container}>
@@ -315,16 +406,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
             </TouchableOpacity>
 
         </View>
-        {showFlatList && (
-        <View style={styles.formFiled2}>
-            <TableHeader />
-            <FlatList
-            data={issueNoteNoArray.data}
-            renderItem={({ item }) => <TableRow item={item} />}
-            keyExtractor={(item) => item.seqNo.toString()}
-        />
-        </View>
-        )} 
+
         <View style={styles.formFiled}>
           
         {changeText ? (
@@ -361,6 +443,33 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
 
         </View>
 
+        <View style={styles.formFiled}>
+          <TextInput
+            style={styles.input}
+            placeholder="IMEI No"
+            placeholderTextColor={'#696969'}
+            value={imeiNo}
+            onChangeText={(text) => setImeiNo(text)}
+          />
+            
+          <TouchableOpacity style={styles.optionbtn} 
+          onPress={handleOk}
+          disabled={isIssueNodissable} >
+            <Text style={styles.optionbtnText}>Ok</Text>
+          </TouchableOpacity>
+        </View>
+        {showFlatList && (
+        <View style={styles.formFiled2}>
+            <TableHeader />
+            <FlatList
+            data={issueNoteNoArray.data}
+            renderItem={({ item }) => <TableRow item={item} />}
+            keyExtractor={(item) => item.seqNo.toString()}
+        />
+        </View>
+        )} 
+    
+
         <Modal
         visible={showIssueListModal}
         transparent={true}
@@ -384,24 +493,10 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
       </Modal>
 
 
-        <View style={styles.formFiled}>
-          <TextInput
-            style={styles.input}
-            placeholder="IMEI No"
-            placeholderTextColor={'#696969'}
-            value={imeiNo}
-            onChangeText={(text) => setImeiNo(text)}
-          />
-            
-          <TouchableOpacity style={styles.optionbtn} 
-          onPress={handleOk}
-          disabled={isIssueNodissable} >
-            <Text style={styles.optionbtnText}>Ok</Text>
-          </TouchableOpacity>
-        </View>
-        
 
-        {showFlatList && (
+        
+{/* selected items view */}
+        {/* {showFlatList && (
   <View style={styles.formFiled2}>
     <TableHeader />
     <FlatList
@@ -412,7 +507,7 @@ const [isIssueNodissable,setisIssueNodissable]=useState(true)
       keyExtractor={(item) => item.seqNo.toString()}
     />
   </View>
-)}
+)} */}
 
 
       <View style={styles.submit}>
@@ -574,7 +669,7 @@ const styles = StyleSheet.create({
   },
   formFiled2: {
     padding:5,
-    height:'20%'
+    height:'40%'
   },
   formFiled3: {
     padding:5,
@@ -592,7 +687,7 @@ const styles = StyleSheet.create({
     alignItems:'center',
     borderBottomWidth: 1,
     borderBottomColor: '#ddd',
-
+    width:'95%'
 
 
   },
@@ -604,8 +699,8 @@ const styles = StyleSheet.create({
   },
   tableCell: {
     fontSize: 14,
-    // width:'50%',
-    // margin:'2%'
+    // width:'95%',
+    margin:'2%',
 
 
   },

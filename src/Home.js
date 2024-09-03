@@ -79,14 +79,14 @@ function Home({navigation,route}) {
                     <Text style={styles.optionbtnText}>Promotion</Text>
                 </View>
             </TouchableOpacity> */}
-            {/* <TouchableOpacity style={styles.optionbtn} onPress={handleChangePassword}>
+            <TouchableOpacity style={styles.optionbtn} >
             <View  style={styles.opImage}>
                     <Image source={require('./img/shopVisit.png')} style={styles.optionbuttonImage} />
                 </View>
                 <View  style={styles.opText}>
                     <Text style={styles.optionbtnText}>Shop visits Check</Text>
                 </View>
-            </TouchableOpacity> */}
+            </TouchableOpacity>
             <TouchableOpacity style={styles.optionbtn} onPress={handleWarrantyRegistration}>
             <View  style={styles.opImage}>
                     <Image source={require('./img/warrantyReg.png')} style={styles.optionbuttonImage} />

@@ -2,9 +2,13 @@ import React, { useState ,useEffect} from 'react';
 import { View, Text, StyleSheet, TouchableOpacity,Image,TextInput,Alert ,FlatList,Modal} from 'react-native';
 
 function IssueInventoryIssueNext({navigation,route}) {
-  const{data}=route.params;
+  const{data,userDetails}=route.params;
 
-  console.log("received dsrId",data.data[0].extraParams)
+  console.log("----------------dsrid",data.data[0].extraParams)
+  console.log("----------------dsrid",data.data[0].userId)
+
+  // console.log("user details",userDetails)
+
 
   const handleHome=async()=>{
     navigation.navigate('Home',{data})
@@ -17,6 +21,75 @@ function IssueInventoryIssueNext({navigation,route}) {
     setDisplayTick([]);
     setSelectAllImage( require('./img/blacktick.png') );
   }
+  const currentDate = new Date();
+  const formattedDate = currentDate.toISOString().split('T')[0];
+  console.log("current date",formattedDate);
+
+  const handleSubmit = async () => {
+    // Prepare the data to be sent in the request
+    // setLoadingIssueNo(true);
+    console.log("selected",displayTick);
+    // console.log("selected",issueNoteNoArray.data[0].issueNo);
+    console.log("display tick",subdealerDetails.salesPrice)
+
+
+    const requestData = {
+      issueNo:issueNoteNoArray.data[0].issueNo,//change
+      distributerID: data.distributorCode,
+      dSRId: data.data[0].extraParams,
+      issueDate: formattedDate,
+      price: subdealerDetails.salesPrice,
+      distributorMargin: 0,
+      delerMargin: 0,
+      discount: 0,
+      status: 1,
+      user:data.data[0].userId,
+      deviceImei:  [],
+      statusMsg: "Processing",
+      toName: "Recipient Name",
+      distributorAddress: data.distributorAddress,
+      distributorCode: data.distributorCode,
+      distributorName: data.distributorName,
+      distributorTelephone: data.distributorTelephone,
+      subdealerAddress:subdealerDetails.subdealerAddress,
+      subdealerCode:subdealerDetails.subdealerCode,
+      subdealerName: subdealerDetails.subdealerName,
+      type: subdealerDetails.type,
+      subdealerTelephone: subdealerDetails.subdealerTelephone,
+      dateInserted: "2024-01-02",
+      manualReceiptNo: "MAN-011"//change
+  
+    };
+
+    try {
+      const apiUrl = 'http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/IssueInventories/addInventoryIssue';
+  
+      const response = await fetch(apiUrl, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestData),
+      });
+  
+      if (response.ok) {
+        const responseData = await response.json();
+        // Handle the response data as needed
+        console.log('Response Data:', responseData);
+        console.log('Response Data:', requestData);
+
+        Alert.alert('Success', 'Inventory accepted successfully.');
+      } else {
+        console.error('Request failed with status:', response.status);
+        Alert.alert('Error', 'Failed to submit inventory. Please try again.');
+      }
+      setLoadingIssueNo(false);
+
+    } catch (error) {
+      console.error('Error during request:', error);
+      Alert.alert('Error', 'An error occurred while processing your request.');
+    }
+  };
   const [issueNoteNoArray,setIssueNoteNoArray]=useState([])
   const [issueNoteNo, setIssueNoteNo] = useState('');
   const [showFlatList, setShowFlatList] = useState(false);
@@ -29,8 +102,10 @@ function IssueInventoryIssueNext({navigation,route}) {
   const handleGetItems =async  () => {
     try {
         setLoadingIssueNo(true);
+        // const apiUrl = `http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/IssueInventories/getInventoryIssueDetail?issueNo=${issueNoteNo}`;
+       
         const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getInventoryIssueDetail?issueNo=${issueNoteNo}`;
-        
+
         const response = await fetch(apiUrl, {
           method: "GET",
           headers: {
@@ -46,6 +121,8 @@ function IssueInventoryIssueNext({navigation,route}) {
          
           if (data && data.data && data.data.length > 0) {
             Alert.alert("Data Received", "Data has been successfully received.");
+          console.log("Data received:", data);
+
             setShowFlatList(true)
           }
         setLoadingIssueNo(false);
@@ -62,49 +139,101 @@ function IssueInventoryIssueNext({navigation,route}) {
 
       }
     };
+
+    // ---------------------
+    const handleGetItemsMyStock =async  () => {
+      try {
+          setLoadingIssueNo(true);
+          // const apiUrl = `http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/IssueInventories/getInventoryIssueDetail?issueNo=${issueNoteNo}`;
+         
+          const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getDSRInventoryIssueDetailMobileP4?dSRId=${data.data[0].extraParams}`;
+          // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getDSRInventoryIssueDetailMobileP4?dSRId=2501`;
+  
+          const response = await fetch(apiUrl, {
+            method: "GET",
+            headers: {
+  
+            },
+          });
+      
+          if (response.ok) {
+            const data = await response.json();
+      
+            console.log("Data received:", data);
+            setIssueNoteNoArray(data)
+           
+            if (data && data.data && data.data.length > 0) {
+              Alert.alert("Data Received", "Data has been successfully received.");
+            console.log("Data received:", data);
+  
+              setShowFlatList(true)
+
+
+
+            }
+          setLoadingIssueNo(false);
+  
+          } else {
+            console.error("Request failed with status:", response.status);
+            Alert.alert("Request failed with status:", response.status);
+  
+          }
+  
+        } catch (error) {
+          console.error("Error during request:", error);
+          Alert.alert("Error during request:", error);
+  
+        }
+      };
+
+    // --------------------
+
+    
+
+    // ------------------------
+    const [modelDetails,setModelDetails]=useState([])
+ 
     const handleGetSelectModel = async () => {
       try {
         setLoadingIssueNo(true);
-
+    
         // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/AcceptInventories/getAcceptInventoryImei?status=2&dsrId=${data.data[0].extraParams}`;
-        const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getAllDSRModelList?dSRId=${data.data[0].extraParams}`;
-
-
+        // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getDSRInventoryIssueDetailMobileP4?dSRId=${data.data[0].extraParams}`;
+        const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/IssueInventories/getDSRInventoryIssueDetailMobileP4?dSRId=${data.data[0].extraParams}`;
+    
         const response = await fetch(apiUrl, {
           method: 'GET',
           headers: {},
         });
-
+    
         if (response.ok) {
           const data = await response.json();
-
-          console.log(data)
-      const uniqueErpModelSet = new Set();
-
-      data.data.forEach(item => {
-        uniqueErpModelSet.add(item.erp_part);
-      });
-
-      const erpModelList = Array.from(uniqueErpModelSet);
-
-      console.log("ERP Model List:", erpModelList);
+          console.log(data);
+          setModelDetails(data);
+    
+          const uniqueErpModelSet = new Set();
+    
+          data.data.forEach(item => {
+            uniqueErpModelSet.add(item.erpModel); // Changed 'erp_part' to 'erpModel'
+          });
+    
+          const erpModelList = Array.from(uniqueErpModelSet);
+    
+          console.log("ERP Model List:", erpModelList);
           setSelectModel(erpModelList);
           setShowSelectModel(true);
-        setLoadingIssueNo(false);
+          setLoadingIssueNo(false);
         } else {
           console.error('Request failed with status:', response.status);
           Alert.alert('Request failed with status:', response.status);
-
         }
       } catch (error) {
         console.error('Error during request:', error);
         Alert.alert('Error during request:', error);
-
       }
-
-    }; 
+    };
+    
   
-
     const TableHeader = () => (
       <View style={styles.tableRow}>
         <Text style={styles.tableHeader}>IMEI No</Text>
@@ -124,6 +253,8 @@ function IssueInventoryIssueNext({navigation,route}) {
                 }
               });
             }}
+            disabled={displayTick.includes(item.imeiNo)} 
+            style={displayTick.includes(item.imeiNo) ? { opacity: 0.5 } : {}} 
           >
             <Image
               source={
@@ -162,25 +293,66 @@ function IssueInventoryIssueNext({navigation,route}) {
       <TouchableOpacity
         style={styles.selectModelrow}
         onPress={() => {
-          setSelectedModel(item);
           handledisplayselectedmodel(item);
+          setSelectedModel(item);
           console.log("erpModel", item);
           closeModal();
+
         }}
       >
         <Text style={styles.selectModelcell}>{item}</Text>
       </TouchableOpacity>
     );
-const handledisplayselectedmodel = ({ item }) => {
+
+    useEffect(() => {
+      console.log("useEffect triggered with selectedModel:", selectedModel);
+      if (selectedModel !== "") {
+        // handledisplayselectedmodel(item);
+        console.log("erpModel", selectedModel);
+        const filteredData = issueNoteNoArray.data.filter(item => item.erpModel === selectedModel);
+
+        console.log("Filtered items:", filteredData);
+        if (filteredData.length > 0) {
+          console.log("----------",filteredData[0].salesPrice)
+          setSubdealerDetails(filteredData[0])
+          console.log(filteredData);
+          const imeiNos = filteredData.map(dataItem => dataItem.imeiNo);
+      
+          setDisplayTick(prevDisplayTick => [...prevDisplayTick, ...imeiNos]);
+        
+        } else {
+          console.log('No matching data found.');
+        }
+        setSelectedModel("")
+        // closeModal();
+      }
+    }, [selectedModel !== ""]);
+    
+const [subdealerDetails,setSubdealerDetails]=useState([])
+console.log('--------------',subdealerDetails)
+const handledisplayselectedmodel =async ({ item }) => {
   console.log("issueNoteArray", issueNoteNoArray);
   console.log("erpmodel", item);
+  console.log("erpmodel", selectedModel);
 
- const filteredData = issueNoteNoArray.data.filter(item => item.erpModel === item);
+ 
 
-  console.log("Filtered items:", filteredData);
-  const imeiNos = filteredData.map(dataItem => dataItem.imeiNo);
+//  const filteredData = issueNoteNoArray.data.filter(item => item.erpModel === "HU-Y541");
 
-  setDisplayTick(prevDisplayTick => [...prevDisplayTick, ...imeiNos]);
+//   console.log("Filtered items:", filteredData);
+//   if (filteredData.length > 0) {
+//     console.log("----------",filteredData[0].salesPrice)
+//     setSubdealerDetails(filteredData[0])
+//     console.log(filteredData);
+//     const imeiNos = filteredData.map(dataItem => dataItem.imeiNo);
+
+//     setDisplayTick(prevDisplayTick => [...prevDisplayTick, ...imeiNos]);
+  
+//   } else {
+//     console.log('No matching data found.');
+//   }
+
+  // const filterModelData=modelDetails.
 };
 
 const [selectAllImage, setSelectAllImage] = useState(require('./img/blacktick.png'));
@@ -220,7 +392,7 @@ const closeModal1 = async() => {
             </TouchableOpacity>
         </View>
             
-        {showFlatList && (
+        {/* {showFlatList && (
         <View style={styles.formFiled2}>
           <TableHeader />
           <FlatList
@@ -229,7 +401,7 @@ const closeModal1 = async() => {
             keyExtractor={(item) => item.seqNo.toString()}
           />
         </View>
-        )}
+        )} */}
         <View style={styles.formFiled}>
           <TextInput
             style={styles.input}
@@ -248,7 +420,11 @@ const closeModal1 = async() => {
             <View style={styles.formFiled1}>
               <Text style={styles.optionbtnText}>IMEI NO </Text>
               <Text style={styles.optionbtnText}>MODEL </Text>
-              <Text style={styles.optionbtnText}>My Stock </Text>
+              {/* <Text style={styles.optionbtnText}>My Stock </Text> */}
+
+              <TouchableOpacity style={styles.selectmodelbtn} onPress={handleGetItemsMyStock} >
+                <Text style={styles.selectmodelbtnText}>My Stock</Text>
+              </TouchableOpacity>
 
               <TouchableOpacity style={styles.selectmodelbtn} onPress={handleGetSelectModel}>
                 <Text style={styles.selectmodelbtnText}>Select model</Text>
@@ -280,6 +456,16 @@ const closeModal1 = async() => {
 
             </View>
             {showFlatList && (
+        <View style={styles.formFiled2}>
+          <TableHeader />
+          <FlatList
+            data={issueNoteNoArray.data}
+            renderItem={({ item }) => <TableRow item={item} />}
+            keyExtractor={(item) => item.seqNo.toString()}
+          />
+        </View>
+        )}
+            {/* {showFlatList && (
             <View style={styles.formFiled4}>
             <FlatList
       
@@ -288,7 +474,7 @@ const closeModal1 = async() => {
               keyExtractor={(item) => item.seqNo.toString()}
             />
             </View>
-            )}
+            )} */}
            
            <Modal
               visible={showSelectModel}
@@ -315,7 +501,7 @@ const closeModal1 = async() => {
             <View style={styles.Cart}>
               <TouchableOpacity style={styles.Cartbtn} onPress={handlecart}>
                 <Image source={require('./img/cart.png')} style={styles.cartbuttonImage} />
-                <Text style={styles.CartbtnText}>Cart</Text>
+                <Text style={styles.CartbtnText}>Cart ({displayTick.length})</Text>
               </TouchableOpacity>
               
             </View>
@@ -352,7 +538,7 @@ const closeModal1 = async() => {
                       <Text style={styles.submitbtnText}>Reset</Text>
                     </TouchableOpacity>
               
-                    <TouchableOpacity style={styles.submitbtn} onPress={handlecart}>
+                    <TouchableOpacity style={styles.submitbtn} onPress={handleSubmit}>
                       <Image source={require('./img/submit.png')} style={styles.submitbuttonImage} />
                       <Text style={styles.submitbtnText}>Submit</Text>
                     </TouchableOpacity>
@@ -464,7 +650,7 @@ const styles = StyleSheet.create({
   },
   Cartbtn:{
     backgroundColor:'#2C5E1A',
-    width:'50%',
+    width:'60%',
     height: 40,
     borderRadius: 20,
     paddingVertical: 10,
@@ -489,7 +675,7 @@ const styles = StyleSheet.create({
     fontWeight:'800',
   },
   selectmodelbtn:{
-    width:'35%',
+    width:'28%',
     height: 60,
     borderRadius: 5,
     paddingVertical: 10,
@@ -511,7 +697,7 @@ const styles = StyleSheet.create({
   },
   formFiled2: {
     padding:5,
-    height:'25%'
+    height:'45%'
   },
   tableRow: {
     flexDirection: 'row',
@@ -530,9 +716,10 @@ const styles = StyleSheet.create({
     
   },
   tableCell: {
-    fontSize: 12,
+    fontSize: 13,
     marginVertical: 3,
-    paddingLeft:'10%',
+    // paddingLeft:'10%',
+    padding:'4%',
     width:'50%',
 
 

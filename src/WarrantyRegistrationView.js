@@ -20,63 +20,69 @@ function WarrantyRegistrationView({navigation,route}) {
   const handleHome=()=>{
     navigation.navigate('Home',{data})
   }
-  const handleWarrantyRegSearch =async  () => {
-    console.log("exchange ref no",exchangeRefNo);
-    console.log("IMEI no",imeiNo);
-    console.log("model no",model);
-    console.log("product no",product);
-    console.log("customer name",customerName);
 
+// --------------------
+const handleWarrantyRegSearch = async () => {
+  console.log("exchange ref no", exchangeRefNo);
+  console.log("IMEI no", imeiNo);
+  console.log("model no", model);
+  console.log("product no", product);
+  console.log("customer name", customerName);
+  console.log("from date", fromDate);
+  console.log("to date", toDate);
 
+  try {
+      let apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/WarrentyRegistrations/getWarrentyRegistration?dsrid=${data.data[0].extraParams}`;
 
-    try {
-
-        // const apiUrl = `http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/WarrentyRegistrations/getWarrentyRegistration?bisId=2523&imeiNo=${imeiNo}&customerName=${customerName}&product=${product}&modleDescription=${model}&warrntyRegRefNo=${exchangeRefNo}`;
-        
-        let apiUrl = 'http://dmsn.lk:8282/SingerPortalWebService-4.1/Services/WarrentyRegistrations/getWarrentyRegistration?';
-
-    // Conditionally add parameters to the URL if they are provided
-    if (exchangeRefNo) {
-      apiUrl += `&warrntyRegRefNo=${exchangeRefNo}`;
-    }
-    if (imeiNo) {
-      apiUrl += `&imeiNo=${imeiNo}`;
-    }
-    if (customerName) {
-      apiUrl += `&customerName=${customerName}`;
-    }
-    if (product) {
-      apiUrl += `&product=${product}`;
-    }
-    if (model) {
-      apiUrl += `&modleDescription=${model}`;
-    }
-
-        const response = await fetch(apiUrl, {
-          method: "GET",
-          headers: {
-
-          },
-        });
-
-        if (response.ok) {
-
-          const data = await response.json();
-          console.log("data",data.data.length)
-
-          if(data.data.length>0){
-            navigation.navigate('WarrantyRegistrationViewDetails',{data:data.data,dsrId:dsrId})
-          }
-          
-        } else {
-
-          console.error("Request failed with status:", response.status);
-        }
-      } catch (error) {
-        console.error("Error during request:", error);
+      // Conditionally add parameters to the URL if they are provided
+      if (exchangeRefNo) {
+          apiUrl += `&warrntyRegRefNo=${exchangeRefNo}`;
+      }
+      if (imeiNo) {
+          apiUrl += `&imeiNo=${imeiNo}`;
+      }
+      if (customerName) {
+          apiUrl += `&customerName=${customerName}`;
+      }
+      if (product) {
+          apiUrl += `&product=${product}`;
+      }
+      if (model) {
+          apiUrl += `&modleDescription=${model}`;
       }
 
-    };
+      // Format and add dates to the URL if they are different
+      if (fromDate && toDate && new Date(fromDate).getTime() !== new Date(toDate).getTime()) {
+          const formattedFromDate = new Date(fromDate).toISOString().split('T')[0].replace(/-/g, '/');
+          const formattedToDate = new Date(toDate).toISOString().split('T')[0].replace(/-/g, '/');
+          apiUrl += `&fromDate=${formattedFromDate}&toDate=${formattedToDate}`;
+      }
+
+      const response = await fetch(apiUrl, {
+          method: "GET",
+          headers: {
+              // Add necessary headers if any
+          },
+      });
+
+      console.log(apiUrl);
+
+      if (response.ok) {
+          const data = await response.json();
+          console.log("data", data.data.length);
+          if (data.data.length > 0) {
+              navigation.navigate('WarrantyRegistrationViewDetails', { data: data.data, dsrId: dsrId });
+          }
+      } else {
+          console.error("Request failed with status:", response.status);
+      }
+  } catch (error) {
+      console.error("Error during request:", error);
+  }
+};
+
+
+// ---------------------
     const [isDisplayEnableFromDate,setDisplayEnableFromDate]=useState(false)
   const [fromDate, setFromDate] = useState(new Date());
 

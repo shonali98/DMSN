@@ -5,7 +5,7 @@ function IssueInventory({navigation,route}) {
   const { data } = route.params;
 
   // const dsrId=extraParams;
-  console.log('Received dsrId:', data.data[0].extraParams); 
+  console.log('Received dsrId:', data.data[0].dsrId); 
   const handleHome = () => {
     navigation.navigate('Home',{data})
     

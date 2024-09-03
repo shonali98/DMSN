@@ -14,6 +14,7 @@ import WarrantyRegistration from './src/WarrantyRegistration';
 import WarrantyRegistrationScan from './src/WarrantyRegistrationScan';
 import WarrantyRegistrationView from './src/WarrantyRegistrationView';
 import IssueInventoryView from './src/IssueInventoryView';
+import IssueInventoryViewSearch from './src/IssueInventoryViewSearch';
 import MyStore from './src/MyStore';
 import MyStoreDetails from './src/MyStoreDetails';
 import AcceptInventoryViewSearch from './src/AcceptInventoryViewSearch';
@@ -37,6 +38,9 @@ function App() {
         <Stack.Screen name="IssueInventory" component={IssueInventory} />
         <Stack.Screen name="IssueInventoryIssue" component={IssueInventoryIssue} />
         <Stack.Screen name="IssueInventoryIssueNext" component={IssueInventoryIssueNext} />
+        <Stack.Screen name="IssueInventoryView" component={IssueInventoryView} />
+        <Stack.Screen name="IssueInventoryViewSearch" component={IssueInventoryViewSearch} />
+
         <Stack.Screen name="WarrantyRegistration" component={WarrantyRegistration} />
         <Stack.Screen name="WarrantyRegistrationScan" component={WarrantyRegistrationScan} />
         <Stack.Screen name="WarrantyRegistrationView" component={WarrantyRegistrationView} />
@@ -44,7 +48,6 @@ function App() {
         <Stack.Screen name="WarrantyRegistrationViewDetailsForm" component={WarrantyRegistrationViewDetailsForm} />
 
 
-        <Stack.Screen name="IssueInventoryView" component={IssueInventoryView} />
         <Stack.Screen name="MyStore" component={MyStore} />
         <Stack.Screen name="MyStoreDetails" component={MyStoreDetails} />
 

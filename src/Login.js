@@ -9,6 +9,7 @@ function Login({ navigation }) {
   const handleLogin = async () => {
     try {
       const url = 'http://dmsn.lk:8282/SingerPortalWebService-4.0/Services/Login/UserValidationAndroidP3';
+      // const url = 'http://203.189.68.156:8181/SingerPortalWebService-4.2/Services/Login/UserValidationAndroidP3';
       const imei = '867353023952463';
       const system = 'SingerAndroid';
   
@@ -170,10 +171,12 @@ const displayAlert = async () => {
           }}
           disabled={isLogDisable}/>
         </View>
-        <View style={styles.otherButtons}>
+
+        {/* check connection button */}
+        {/* <View style={styles.otherButtons}>
           <Button color="#CD0405" title="Check Connection " onPress={handleCheckServer} />
 
-        </View>
+        </View> */}
       </ImageBackground>
     </>
   );
